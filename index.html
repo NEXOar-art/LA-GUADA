@@ -1,46 +1,1267 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#f7f0e5">
-  <meta name="description" content="La Guada — parrilla argentina en San Fernando del Valle de Catamarca. Reservá tu mesa y disfrutá el ritual del fuego.">
-  <title>La Guada — Parrilla de barrio, fuego de siempre</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css">
-  <script type="importmap">
-    {"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.187.0/build/three.module.js"}}
-  </script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>La Guada — Parrilla de barrio, fuego de siempre</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --cream: #faf6f0;
+  --ink: #2d2420;
+  --muted: #6b5d56;
+  --terracotta: #d4694f;
+  --ember: #e8845f;
+  --peach: #f4b89a;
+  --butter: #f5d67a;
+  --sage: #a8c4a0;
+  --charcoal: #3d3230;
+  --line: #2d242018;
+  --display: 'DM Serif Display', Georgia, serif;
+  --sans: 'DM Sans', Arial, sans-serif;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 90px; }
+body {
+  margin: 0;
+  background: var(--cream);
+  color: var(--ink);
+  font: 400 15px/1.55 var(--sans);
+  overflow-x: hidden;
+}
+a { color: inherit; text-decoration: none; }
+button, input, select { font: inherit; }
+
+/* Progress Bar */
+.scroll-progress {
+  position: fixed;
+  z-index: 100;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 4px;
+  background: #ffffff33;
+  pointer-events: none;
+}
+.scroll-progress span {
+  display: block;
+  width: 0;
+  height: 100%;
+  background: linear-gradient(90deg, var(--butter), var(--ember), var(--terracotta));
+  box-shadow: 0 0 12px var(--butter);
+  will-change: width;
+  transition: width .1s;
+}
+
+/* Announcement */
+.announcement {
+  height: 32px;
+  background: var(--charcoal);
+  color: #f8efe4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  letter-spacing: .16em;
+  font-size: .59rem;
+  font-weight: 600;
+}
+.announcement-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--butter);
+  box-shadow: 0 0 0 4px #efd58e24;
+}
+
+/* Header */
+.site-header {
+  height: 86px;
+  padding: 0 max(5.5vw, 28px);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  z-index: 10;
+  background: var(--cream);
+  border-bottom: 1px solid var(--line);
+}
+.wordmark {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font: 1.5rem/1 var(--display);
+  letter-spacing: -.04em;
+}
+.wordmark small {
+  display: block;
+  font: 600 .48rem/1.5 var(--sans);
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.brand-stamp {
+  width: 39px;
+  height: 39px;
+  border: 1px solid var(--terracotta);
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: var(--terracotta);
+  font: italic 1rem var(--display);
+  transform: rotate(-10deg);
+}
+nav {
+  display: flex;
+  align-items: center;
+  gap: 36px;
+  font-size: .77rem;
+  font-weight: 600;
+}
+nav > a:not(.nav-reserve) { transition: color .2s; }
+nav > a:not(.nav-reserve):hover { color: var(--terracotta); }
+.nav-reserve, .pill-button {
+  background: var(--terracotta);
+  color: #fff9f0;
+  padding: 14px 19px;
+  border-radius: 3px;
+  font-size: .73rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 17px;
+  transition: transform .25s, box-shadow .25s;
+}
+.nav-reserve:hover, .pill-button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px #bb604d30;
+}
+
+/* Hero */
+.hero {
+  min-height: 850px;
+  height: calc(100vh - 117px);
+  display: flex;
+  align-items: center;
+  padding: 65px 7vw 78px;
+  position: relative;
+  overflow: hidden;
+}
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+}
+.hero-bg img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  filter: saturate(1.05) brightness(.75);
+  animation: zoomOut 20s ease-out forwards, subtleMove 30s ease-in-out infinite alternate;
+  will-change: transform;
+}
+@keyframes zoomOut {
+  0% { transform: scale(1.3); }
+  100% { transform: scale(1); }
+}
+@keyframes subtleMove {
+  0% { object-position: 50% 50%; }
+  100% { object-position: 55% 45%; }
+}
+.hero-bg:after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, #2d2420ee 0%, #2d2420cc 40%, #2d242066 70%, transparent 100%),
+              linear-gradient(0deg, #2d2420aa 0%, transparent 40%);
+  z-index: 1;
+}
+.hero-content {
+  position: relative;
+  z-index: 2;
+  max-width: 620px;
+  animation: riseIn .85s .1s both;
+}
+@keyframes riseIn {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: none; }
+}
+.kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  color: var(--butter);
+  font-size: .63rem;
+  font-weight: 700;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+}
+.kicker i {
+  display: block;
+  width: 17px;
+  height: 1px;
+  background: var(--butter);
+}
+.hero h1 {
+  font: 400 clamp(4.6rem, 8.2vw, 8.15rem)/.88 var(--display);
+  letter-spacing: -.065em;
+  margin: 27px 0 24px;
+  color: #fff8eb;
+}
+.hero h1 em {
+  color: var(--butter);
+  font-weight: 400;
+}
+.hero-content > p {
+  color: #f4e4dc;
+  font-size: .95rem;
+  max-width: 400px;
+  line-height: 1.75;
+  margin: 0;
+}
+.hero-links {
+  display: flex;
+  align-items: center;
+  gap: 27px;
+  margin-top: 28px;
+}
+.pill-button { padding: 15px 20px; }
+.under-link {
+  font-size: .72rem;
+  font-weight: 700;
+  color: #fff7ef;
+  border-bottom: 1px solid #fff7ef88;
+  padding: 8px 0;
+  transition: border-color .2s;
+}
+.under-link:hover { border-color: var(--butter); }
+.under-link span { color: var(--butter); padding-left: 8px; }
+
+.hero-stats {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  margin-top: 49px;
+  font-size: .58rem;
+  line-height: 1.45;
+  color: #f1e3dc;
+}
+.stat-number {
+  font: 2.35rem var(--display);
+  color: #fff8ec;
+  font-variant-numeric: tabular-nums;
+}
+.stat-divider {
+  height: 32px;
+  border-left: 1px solid #ffffff33;
+  margin: 0 9px;
+}
+.stat-price {
+  font: 1.2rem var(--display);
+  color: #fff8ec;
+  font-variant-numeric: tabular-nums;
+}
+.stat-price small {
+  display: block;
+  color: #f0d9cd;
+  font: 600 .52rem var(--sans);
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+/* Ticker */
+.ticker {
+  overflow: hidden;
+  background: var(--butter);
+  height: 64px;
+  display: flex;
+  align-items: center;
+  color: var(--charcoal);
+  box-shadow: inset 0 1px #fff6d5, inset 0 -1px #dfbd56;
+}
+.ticker-track {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  gap: 38px;
+  min-width: max-content;
+  width: 100%;
+  animation: ticker 23s linear infinite;
+  font-size: .7rem;
+  font-weight: 700;
+  letter-spacing: .17em;
+}
+.ticker-track b {
+  font-size: 1rem;
+  color: var(--terracotta);
+}
+@keyframes ticker {
+  to { transform: translateX(-50%); }
+}
+
+/* Sections */
+.section-pad {
+  padding: 125px max(7vw, 30px);
+}
+
+/* Story */
+.story {
+  display: grid;
+  grid-template-columns: 1fr .87fr;
+  gap: 10vw;
+  align-items: center;
+}
+.story-photo {
+  height: 520px;
+  position: relative;
+  background: var(--peach);
+  overflow: hidden;
+}
+.story-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  filter: saturate(.85);
+}
+.photo-tag, .photo-index {
+  position: absolute;
+  padding: 10px 12px;
+  background: var(--cream);
+  font-size: .52rem;
+  letter-spacing: .12em;
+  font-weight: 700;
+}
+.photo-tag { top: 17px; left: 17px; }
+.photo-index { right: 17px; bottom: 17px; background: var(--butter); }
+.story-copy { max-width: 480px; }
+.story h2, .section-intro h2, .reservation h2, .visit h2 {
+  font: 400 clamp(3.2rem, 5.2vw, 5.4rem)/.99 var(--display);
+  letter-spacing: -.055em;
+  margin: 20px 0 24px;
+}
+.story h2 em, .section-intro h2 em, .reservation h2 em, .visit h2 em {
+  color: var(--terracotta);
+  font-weight: 400;
+}
+.story-copy > p, .section-intro > p {
+  max-width: 445px;
+  color: var(--muted);
+  font-size: .86rem;
+  line-height: 1.85;
+}
+.story-signature {
+  margin-top: 27px;
+  font: italic 1.08rem var(--display);
+}
+.story-signature span { color: var(--muted); }
+.story-stats {
+  display: flex;
+  gap: 24px;
+  border-top: 1px solid var(--line);
+  margin-top: 35px;
+  padding-top: 19px;
+}
+.story-stats > div { display: grid; gap: 3px; }
+.story-stats b { font: 1.15rem var(--display); }
+.story-stats small {
+  font-size: .53rem;
+  text-transform: uppercase;
+  letter-spacing: .09em;
+  color: var(--muted);
+}
+
+/* Ritual */
+.ritual {
+  background: #eee3ff;
+  padding-top: 103px;
+  padding-bottom: 119px;
+}
+.section-intro {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  margin: 0 auto 43px;
+  max-width: 1120px;
+}
+.section-intro h2 {
+  font-size: clamp(3rem, 5vw, 4.8rem);
+  margin-bottom: 0;
+}
+.section-intro > p {
+  max-width: 310px;
+  margin: 0 4% 7px 20px;
+}
+.ritual-grid {
+  max-width: 1120px;
+  margin: auto;
+  display: grid;
+  grid-template-columns: 1.25fr .75fr;
+  grid-template-rows: 255px 255px;
+  gap: 16px;
+}
+.ritual-card {
+  position: relative;
+  overflow: hidden;
+  padding: 23px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: transform .3s;
+}
+.ritual-card:hover { transform: translateY(-4px); }
+.card-large {
+  grid-row: span 2;
+  min-height: 526px;
+  background: var(--sage);
+  color: #fff;
+}
+.ritual-card img, .card-shade {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.card-large img {
+  filter: brightness(.75) saturate(.78);
+  transition: transform .8s;
+}
+.ritual-card:hover img { transform: scale(1.05); }
+.card-large:after {
+  content: '';
+  position: absolute;
+  inset: 25% 0 0;
+  background: linear-gradient(transparent, #201913b8);
+}
+.card-meta, .card-copy {
+  position: relative;
+  z-index: 1;
+}
+.card-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: .55rem;
+  font-weight: 700;
+  letter-spacing: .12em;
+}
+.card-copy h3 {
+  font: 2.35rem var(--display);
+  letter-spacing: -.03em;
+  margin: 0 0 1px;
+}
+.card-copy p { font-size: .72rem; margin: 0; }
+.sage-card {
+  background: #c9e9c1;
+  color: #39443a;
+}
+.sage-card .card-copy p { color: #566250; }
+.peach-card {
+  background: var(--ember);
+  color: #fff;
+}
+.peach-card img {
+  filter: brightness(.6) saturate(.8);
+  transition: transform .8s;
+}
+.peach-card .card-shade {
+  background: linear-gradient(0deg, #39241fc9, transparent 80%);
+  z-index: 0;
+}
+
+/* Reservation */
+.reservation {
+  position: relative;
+  overflow: hidden;
+  background: var(--terracotta);
+  padding: 110px 7vw;
+  color: #fff8ec;
+}
+.reservation-inner {
+  max-width: 1120px;
+  margin: auto;
+  display: grid;
+  grid-template-columns: .85fr 1fr;
+  gap: 9vw;
+  align-items: center;
+  position: relative;
+  z-index: 1;
+}
+.reservation .kicker { color: #ffead7; }
+.reservation .kicker i { background: #f8d6b9; }
+.reservation h2 {
+  font-size: clamp(3.7rem, 6vw, 6rem);
+}
+.reservation h2 em { color: var(--butter); }
+.reservation-copy > p {
+  max-width: 390px;
+  font-size: .84rem;
+  color: #ffe6d6;
+  line-height: 1.8;
+}
+.reservation-points {
+  display: grid;
+  gap: 13px;
+  margin-top: 28px;
+  font-size: .7rem;
+  color: #fff1e5;
+}
+.reservation-points b { color: var(--butter); padding-right: 9px; }
+.booking-card {
+  background: var(--cream);
+  color: var(--ink);
+  padding: 34px 36px 24px;
+  box-shadow: 12px 13px 0 #8f4b4380;
+}
+.form-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #a87568;
+  font-size: .57rem;
+  font-weight: 700;
+  letter-spacing: .16em;
+}
+.booking-card h3 {
+  font: 2rem var(--display);
+  margin: 9px 0 3px;
+}
+.booking-card > p {
+  font-size: .69rem;
+  color: var(--muted);
+  margin-bottom: 23px;
+}
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 17px 13px;
+}
+.field { display: grid; gap: 7px; }
+.field-wide { grid-column: 1 / -1; }
+.field > span { font-size: .65rem; font-weight: 700; }
+.field > span b { color: var(--terracotta); }
+.field > span small {
+  font-size: .58rem;
+  color: #90847a;
+  font-weight: 400;
+}
+.field input, .field select {
+  width: 100%;
+  height: 44px;
+  padding: 0 12px;
+  border: 1px solid #d9cec0;
+  background: #fffdf8;
+  color: var(--ink);
+  border-radius: 2px;
+  outline: none;
+  font-size: .69rem;
+  transition: border-color .2s, box-shadow .2s;
+}
+.field input:focus, .field select:focus {
+  border-color: var(--terracotta);
+  box-shadow: 0 0 0 3px #bd705f18;
+}
+.submit-button {
+  width: 100%;
+  height: 48px;
+  margin-top: 20px;
+  border: 0;
+  background: var(--charcoal);
+  color: #fff9ef;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  font-size: .7rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background .2s, transform .2s;
+}
+.submit-button:hover {
+  background: #4a3d3a;
+  transform: translateY(-2px);
+}
+.form-foot {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 14px;
+  font-size: .53rem;
+  color: #8d8177;
+}
+
+/* Visit */
+.visit {
+  padding-top: 112px;
+  padding-bottom: 113px;
+}
+.visit-top {
+  max-width: 1120px;
+  margin: 0 auto 35px;
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+}
+.visit h2 { margin-bottom: 0; }
+.dark-button {
+  background: var(--charcoal);
+  margin-bottom: 8px;
+}
+.dark-button:hover { box-shadow: 0 10px 20px #594b6230; }
+.visit-grid {
+  max-width: 1120px;
+  margin: auto;
+  display: grid;
+  grid-template-columns: 1.35fr .65fr;
+  min-height: 420px;
+}
+.map-wrap {
+  position: relative;
+  min-height: 420px;
+  background: var(--sage);
+  overflow: hidden;
+}
+.map-wrap iframe {
+  width: 100%;
+  height: 100%;
+  min-height: 420px;
+  border: 0;
+  filter: saturate(.62) contrast(.94);
+}
+.map-open {
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+  background: var(--cream);
+  padding: 12px 15px;
+  font-size: .63rem;
+  font-weight: 700;
+  box-shadow: 0 4px 14px #392d2a20;
+  transition: transform .2s;
+}
+.map-open:hover { transform: translateY(-2px); }
+.contact-card {
+  background: var(--sage);
+  padding: 39px 37px;
+  position: relative;
+  overflow: hidden;
+}
+.contact-card .kicker { position: relative; }
+.contact-card h3 {
+  position: relative;
+  font: 2.35rem/1.03 var(--display);
+  letter-spacing: -.03em;
+  margin: 16px 0 29px;
+}
+.contact-row {
+  display: grid;
+  gap: 6px;
+  padding: 13px 0;
+  border-top: 1px solid #3946382a;
+}
+.contact-row > span:first-child {
+  font-size: .52rem;
+  font-weight: 700;
+  letter-spacing: .13em;
+  color: #667364;
+}
+.contact-row > a, .contact-row > span:last-child {
+  font-size: .67rem;
+  line-height: 1.55;
+  color: #465044;
+}
+.contact-row > a:hover { color: var(--terracotta); }
+.social-link {
+  display: flex;
+  justify-content: space-between;
+  padding-top: 18px;
+  margin-top: 4px;
+  border-top: 1px solid #3946382a;
+  font-size: .67rem;
+  font-weight: 700;
+  color: #465044;
+}
+.social-link span { color: var(--terracotta); }
+
+/* Footer */
+.site-footer {
+  background: var(--charcoal);
+  color: #f7eee5;
+  padding: 40px max(7vw, 30px) 25px;
+}
+.footer-main {
+  max-width: 1120px;
+  margin: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 25px;
+}
+.site-footer .brand-stamp {
+  color: var(--butter);
+  border-color: var(--butter);
+}
+.site-footer .wordmark small { color: #d2c2c5; }
+.footer-contact {
+  display: flex;
+  align-items: center;
+  gap: 25px;
+  color: #e4d7d2;
+  font-size: .66rem;
+}
+.footer-contact a:hover { color: var(--butter); }
+.footer-book {
+  font-size: .69rem;
+  font-weight: 700;
+  color: var(--butter);
+}
+.footer-bottom {
+  max-width: 1120px;
+  margin: 22px auto 0;
+  padding-top: 15px;
+  border-top: 1px solid #ffffff29;
+  display: flex;
+  justify-content: space-between;
+  color: #ccbec2;
+  font-size: .55rem;
+}
+.footer-bottom b { color: var(--butter); padding-left: 6px; }
+
+/* WhatsApp Float */
+.wa-float {
+  position: fixed;
+  z-index: 20;
+  right: 22px;
+  bottom: 21px;
+  width: 53px;
+  height: 53px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: #56a67c;
+  color: #fff;
+  box-shadow: 0 7px 22px #223b2a45;
+  transition: transform .25s;
+}
+.wa-float:hover {
+  transform: translateY(-4px) rotate(-8deg);
+}
+.wa-float svg { width: 24px; height: 24px; fill: currentColor; }
+
+/* Reveal Animation */
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity .7s ease, transform .7s cubic-bezier(.2, .7, .2, 1);
+}
+.reveal.visible {
+  opacity: 1;
+  transform: none;
+}
+.ritual-card.reveal:nth-child(2) { transition-delay: .1s; }
+.ritual-card.reveal:nth-child(3) { transition-delay: .2s; }
+
+/* Responsive */
+@media (max-width: 900px) {
+  .site-header { padding: 0 28px; }
+  nav { gap: 19px; }
+  .hero { padding: 55px 5vw 68px; }
+  .section-pad { padding-left: 6vw; padding-right: 6vw; }
+  .story { gap: 6vw; }
+  .story-photo { height: 440px; }
+  .reservation { padding-left: 5vw; padding-right: 5vw; }
+  .reservation-inner { gap: 5vw; }
+  .booking-card { padding: 29px 25px 21px; }
+  .visit-grid { grid-template-columns: 1.1fr .9fr; }
+  .contact-card { padding: 32px 25px; }
+  .footer-contact { gap: 14px; }
+}
+@media (max-width: 680px) {
+  .announcement { font-size: .48rem; letter-spacing: .1em; }
+  .site-header { height: 72px; padding: 0 18px; }
+  .wordmark { font-size: 1.35rem; }
+  .brand-stamp { width: 34px; height: 34px; }
+  nav { gap: 0; }
+  nav > a:not(.nav-reserve) { display: none; }
+  .nav-reserve { padding: 12px 13px; font-size: .65rem; }
+  .hero {
+    display: flex;
+    min-height: 805px;
+    height: auto;
+    padding: 56px 22px 48px;
+    align-items: flex-start;
+  }
+  .hero-content { width: 100%; padding-top: 23px; }
+  .hero h1 { font-size: clamp(4.35rem, 18vw, 6.3rem); }
+  .hero-stats { margin-top: 32px; }
+  .ticker { height: 53px; }
+  .ticker-track { gap: 25px; font-size: .58rem; }
+  .section-pad { padding: 77px 19px; }
+  .story { grid-template-columns: 1fr; gap: 37px; }
+  .story-photo { height: 350px; margin: 0 8px; }
+  .story-copy { padding: 0 3px; }
+  .story h2, .section-intro h2, .visit h2 { font-size: 3.45rem; }
+  .story-stats { gap: 20px; justify-content: space-between; }
+  .story-stats b { font-size: 1rem; }
+  .story-stats small { font-size: .47rem; }
+  .ritual { padding-top: 74px; padding-bottom: 77px; }
+  .section-intro { display: block; margin-bottom: 27px; }
+  .section-intro h2 { margin-bottom: 15px; }
+  .section-intro > p { margin: 0; font-size: .78rem; }
+  .ritual-grid { grid-template-columns: 1fr 1fr; grid-template-rows: 330px 240px; gap: 10px; }
+  .card-large { grid-column: 1/-1; grid-row: auto; min-height: 330px; }
+  .ritual-card { padding: 16px; }
+  .card-meta { font-size: .45rem; }
+  .card-copy h3 { font-size: 1.7rem; }
+  .card-copy p { font-size: .65rem; }
+  .reservation { padding: 72px 18px; }
+  .reservation-inner { grid-template-columns: 1fr; gap: 38px; }
+  .reservation h2 { font-size: 4.25rem; margin: 18px 0; }
+  .reservation-copy > p { font-size: .8rem; }
+  .reservation-points { font-size: .66rem; }
+  .booking-card { padding: 26px 20px 19px; box-shadow: 7px 8px 0 #8f4b4380; }
+  .booking-card h3 { font-size: 1.8rem; }
+  .field input, .field select { height: 43px; }
+  .visit { padding-top: 75px; padding-bottom: 80px; }
+  .visit-top { align-items: start; gap: 15px; margin-bottom: 25px; }
+  .visit h2 { font-size: 3.15rem; }
+  .dark-button { font-size: .63rem; padding: 13px 14px; white-space: nowrap; margin-top: 30px; }
+  .visit-grid { grid-template-columns: 1fr; }
+  .map-wrap, .map-wrap iframe { min-height: 330px; }
+  .contact-card { padding: 29px 24px; }
+  .contact-card h3 { font-size: 2.1rem; }
+  .site-footer { padding: 25px 19px 18px; }
+  .footer-main { align-items: flex-start; flex-wrap: wrap; }
+  .footer-contact {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    font-size: .6rem;
+  }
+  .footer-contact a:nth-child(2) { grid-row: span 2; }
+  .footer-book { margin-top: -44px; align-self: flex-end; }
+  .footer-bottom { font-size: .48rem; gap: 12px; }
+  .wa-float { width: 49px; height: 49px; right: 14px; bottom: 14px; }
+}
+@media (max-width: 390px) {
+  .form-grid { grid-template-columns: 1fr; }
+  .field-wide { grid-column: auto; }
+  .visit-top { display: block; }
+  .dark-button { display: inline-flex; margin-top: 17px; }
+  .hero { min-height: 790px; }
+  .story-stats { gap: 12px; }
+  .story-stats b { font-size: .9rem; }
+  .hero-stats { gap: 8px; }
+  .hero-stats .stat-number { font-size: 2rem; }
+  .hero-stats .stat-price { font-size: 1.03rem; }
+  .stat-divider { margin: 0 5px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+  .reveal { opacity: 1; transform: none; }
+  .hero-bg img { animation: none; }
+}
+</style>
 </head>
 <body>
-  <div class="scroll-progress" aria-hidden="true"><span id="scroll-progress-fill"></span></div>
-  <div class="announcement"><span class="announcement-dot"></span> PARRILLA ARGENTINA · SAN FERNANDO DEL VALLE DE CATAMARCA</div>
-  <header class="site-header">
-    <a class="wordmark" href="#inicio" aria-label="La Guada, inicio"><span class="brand-stamp">LG</span><span>la guada<small>parrilla de barrio</small></span></a>
-    <nav aria-label="Navegación principal"><a href="#historia">La casa</a><a href="#sabores">El ritual</a><a href="#visitanos">Cómo llegar</a><a class="nav-reserve" href="#reservas">Guardame un lugar <span>↗</span></a></nav>
-  </header>
-  <main>
-    <section class="hero" id="inicio">
-      <div class="hero-copy"><span class="kicker"><i></i> Catamarca, Argentina · Desde siempre</span><h1>La mesa<br>está <em>servida.</em></h1><p>Brasas encendidas, una charla que se alarga y ese primer bocado que hace que todo lo demás espere.</p><div class="hero-links"><a class="pill-button" href="#reservas">Reservá tu mesa <span>↗</span></a><a class="under-link" href="#historia">Conocé La Guada <span>↓</span></a></div><div class="hero-proof"><span class="proof-number"><span data-count="1257" data-format="locale">0</span></span><span>personas dejaron<br>su opinión</span><span class="proof-divider"></span><span class="proof-price">$<span data-count="30">0</span>–<span data-count="40">0</span> mil<small>por persona</small></span></div></div>
-      <div class="hero-art" aria-label="Fachada de La Guada en San Fernando del Valle de Catamarca">
-        <img class="hero-photo" src="LAGUADA.jpg" alt="Frente de La Guada, con su entrada iluminada por la noche" fetchpriority="high">
-        <div class="art-topline"><span>ASÍ SE VE LA GUADA</span><span>CATAMARCA · ARGENTINA</span></div>
-        <canvas id="fire-scene" aria-hidden="true"></canvas>
-        <div class="art-sticker"><span>ACÁ<br>NOS VEMOS</span><b>✳</b></div>
-        <div class="art-caption"><span>LA GUADA · AYACUCHO 769</span><span>El fuego nos reúne.</span></div>
+
+<div class="scroll-progress"><span id="scroll-progress-fill"></span></div>
+
+<div class="announcement">
+  <span class="announcement-dot"></span>
+  CATAMARCA · ARGENTINA · DESDE SIEMPRE
+</div>
+
+<header class="site-header">
+  <a href="#inicio" class="wordmark">
+    <span class="brand-stamp">LG</span>
+    <div>
+      la guada
+      <small>parrilla de barrio</small>
+    </div>
+  </a>
+  <nav>
+    <a href="#historia">La casa</a>
+    <a href="#sabores">El ritual</a>
+    <a href="#visitanos">Cómo llegar</a>
+    <a href="#reservas" class="nav-reserve">Guardame un lugar <span>↗</span></a>
+  </nav>
+</header>
+
+<section class="hero" id="inicio">
+  <div class="hero-bg">
+    <img src="https://images.unsplash.com/photo-1558030006-450675393462?auto=format&fit=crop&w=1920&q=85" alt="Parrilla La Guada">
+  </div>
+  <div class="hero-content">
+    <div class="kicker">
+      <i></i>
+      Catamarca, Argentina · Desde siempre
+    </div>
+    <h1>La mesa<br>está <em>servida.</em></h1>
+    <p>Brasas encendidas, una charla que se alarga y ese primer bocado que hace que todo lo demás espere.</p>
+    <div class="hero-links">
+      <a href="#reservas" class="pill-button">Reservá tu mesa <span>↗</span></a>
+      <a href="#historia" class="under-link">Conocé La Guada <span>↓</span></a>
+    </div>
+    <div class="hero-stats">
+      <div>
+        <span class="stat-number" data-count="1257">0</span>
+        personas dejaron<br>su opinión
       </div>
-      <div class="hero-side-label">BUENOS MOMENTOS, SIN PRISA</div>
-    </section>
-    <div class="ticker" aria-label="Una mesa larga, sobremesa y para compartir"><div class="ticker-track"><span>UNA MESA LARGA</span><b>✳</b><span>SOBREMESA</span><b>✳</b><span>PARA COMPARTIR</span><b>✳</b><span>HECHO A LAS BRASAS</span><b>✳</b><span>UNA MESA LARGA</span><b>✳</b><span>SOBREMESA</span><b>✳</b><span>PARA COMPARTIR</span><b>✳</b><span>HECHO A LAS BRASAS</span><b>✳</b></div></div>
-    <section class="story section-pad" id="historia"><div class="story-photo reveal"><img src="https://images.unsplash.com/photo-1558030006-450675393462?auto=format&fit=crop&w=1100&q=85" alt="Carne recién salida de la parrilla"><span class="photo-tag">AL CALOR DE LAS BRASAS</span><span class="photo-index">CATAMARCA · ARG.</span></div><div class="story-copy reveal"><span class="kicker"><i></i> Una mesa, muchas historias</span><h2>El fuego junta.<br>La mesa <em>acerca.</em></h2><p>En La Guada, la parrilla es el comienzo. Lo que sigue es de ustedes: reencontrarse, celebrar, pedir un poco más de pan y quedarse un ratito más.</p><p>Un lugar para disfrutar los sabores de siempre en San Fernando del Valle de Catamarca.</p><div class="story-signature">Nos vemos alrededor del fuego <span>— La Guada</span></div><div class="story-stats"><div><b>+<span data-count="1257" data-format="locale">0</span></b><small>opiniones</small></div><div><b>$<span data-count="30">0</span>–<span data-count="40">0</span> mil</b><small>por persona</small></div><div><b>Catamarca</b><small>nuestro lugar</small></div></div></div></section>
-    <section class="ritual section-pad" id="sabores"><div class="section-intro reveal"><div><span class="kicker"><i></i> El ritual de venir</span><h2>Más que comer.<br><em>Encontrarse.</em></h2></div><p>Hay cosas que saben mejor cuando se comparten. Prepará el apetito; del resto nos encargamos entre todos.</p></div><div class="ritual-grid"><article class="ritual-card card-large reveal"><img src="https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=1100&q=85" alt="Cortes argentinos cocinándose a las brasas"><div class="card-meta"><span>01 · EL CENTRO DE LA MESA</span><span>✳</span></div><div class="card-copy"><h3>La parrilla</h3><p>Buenas brasas, tiempo y sabor de verdad.</p></div></article><article class="ritual-card card-small sage-card reveal"><span class="card-doodle">✳</span><div class="card-meta"><span>02 · LO QUE VA AL MEDIO</span><span>✳</span></div><div class="card-copy"><h3>Algo para compartir</h3><p>Que nadie se quede con las ganas.</p></div><span class="hand-note">pedimos<br>otra ronda <b>↗</b></span></article><article class="ritual-card card-small peach-card reveal"><img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=900&q=80" alt="Salón cálido para reunirse a comer"><div class="card-shade"></div><div class="card-meta"><span>03 · QUEDARSE UN POCO MÁS</span><span>✳</span></div><div class="card-copy"><h3>La sobremesa</h3><p>El mejor plan no mira el reloj.</p></div></article></div></section>
-    <section class="reservation" id="reservas"><div class="reservation-scribble" aria-hidden="true">nos vemos</div><div class="reservation-inner"><div class="reservation-copy reveal"><span class="kicker"><i></i> Tu lugar está por acá</span><h2>El próximo<br>brindis <em>es tuyo.</em></h2><p>Completá tus datos y te llevamos a WhatsApp con el mensaje listo. La confirmación de disponibilidad la hacemos por ahí.</p><div class="reservation-points"><span><b>✳</b> Elegí el día que te gustaría venir</span><span><b>✳</b> Te respondemos directo por WhatsApp</span><span><b>✳</b> Ayacucho 769, Catamarca</span></div></div><form class="booking-card reveal" id="booking-form"><div class="form-heading"><span>01 — RESERVAS</span><span class="form-flower">✳</span></div><h3>Contanos de tu visita.</h3><p>Los campos con * son necesarios.</p><div class="form-grid"><label class="field field-wide"><span>Nombre y apellido <b>*</b></span><input id="name" name="name" type="text" placeholder="Tu nombre completo" autocomplete="name" required></label><label class="field"><span>Día y fecha <b>*</b></span><input id="date" name="date" type="date" required></label><label class="field"><span>Asistentes <b>*</b></span><select id="guests" name="guests" required><option value="">¿Cuántos vienen?</option><option>1 persona</option><option>2 personas</option><option>3 personas</option><option>4 personas</option><option>5 personas</option><option>6 personas</option><option>7 personas</option><option>8 personas</option><option>9 o más personas</option></select></label><label class="field field-wide"><span>E-mail <small>opcional</small></span><input id="email" name="email" type="email" placeholder="tu@email.com" autocomplete="email"></label></div><button class="submit-button" type="submit">Preparar mensaje en WhatsApp <span>↗</span></button><div class="form-foot"><span>Tu reserva se consulta directamente con el restaurante.</span><span>✳</span></div></form></div></section>
-    <section class="visit section-pad" id="visitanos"><div class="visit-top reveal"><div><span class="kicker"><i></i> Estamos en San Fernando</span><h2>Dobla por acá.<br><em>Te esperamos.</em></h2></div><a class="pill-button dark-button" href="https://maps.app.goo.gl/pzXtZ1a3ck9ShzBs9" target="_blank" rel="noopener">Cómo llegar <span>↗</span></a></div><div class="visit-grid"><div class="map-wrap reveal"><iframe title="Mapa para llegar a La Guada, Catamarca" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="https://maps.google.com/maps?q=Ayacucho%20769%2C%20San%20Fernando%20del%20Valle%20de%20Catamarca%2C%20Argentina&output=embed"></iframe><a class="map-open" href="https://maps.app.goo.gl/pzXtZ1a3ck9ShzBs9" target="_blank" rel="noopener">Abrir en Google Maps ↗</a></div><aside class="contact-card reveal"><span class="contact-flower">✳</span><span class="kicker"><i></i> A mano</span><h3>Un mensaje<br>y nos vemos.</h3><div class="contact-row"><span>VISITANOS</span><a href="https://maps.app.goo.gl/pzXtZ1a3ck9ShzBs9" target="_blank" rel="noopener">Ayacucho 769, K4700FVJ<br>San Fernando del Valle de Catamarca ↗</a></div><div class="contact-row"><span>LLAMANOS</span><a href="tel:+543834033990">0383 403-3990 ↗</a></div><div class="contact-row"><span>HORARIOS</span><span>Consultanos por WhatsApp para confirmar horarios y disponibilidad.</span></div><a class="social-link" href="https://www.facebook.com/laguadaparrilla/" target="_blank" rel="noopener">Encontranos en Facebook <span>↗</span></a></aside></div></section>
-  </main>
-  <footer class="site-footer"><div class="footer-main"><a class="wordmark" href="#inicio"><span class="brand-stamp">LG</span><span>la guada<small>parrilla de barrio</small></span></a><div class="footer-contact"><a href="tel:+543834033990">0383 403-3990</a><a href="https://maps.app.goo.gl/pzXtZ1a3ck9ShzBs9" target="_blank" rel="noopener">Ayacucho 769, Catamarca</a><a href="https://www.facebook.com/laguadaparrilla/" target="_blank" rel="noopener">Facebook ↗</a></div><a class="footer-book" href="#reservas">Reservá tu mesa ↑</a></div><div class="footer-bottom"><span>© <span id="year"></span> La Guada Parrilla · San Fernando del Valle de Catamarca</span><span>Hecho para compartir <b>✳</b></span></div></footer>
-  <a class="wa-float" href="https://wa.me/5493834033990?text=Hola%20La%20Guada%2C%20quisiera%20hacer%20una%20consulta." target="_blank" rel="noopener" aria-label="Escribir a La Guada por WhatsApp"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.52 3.48A11.79 11.79 0 0 0 12.13 0C5.58 0 .25 5.33.25 11.88c0 2.09.55 4.14 1.6 5.94L.15 24l6.34-1.66a11.9 11.9 0 0 0 5.64 1.44h.01c6.55 0 11.88-5.33 11.88-11.88 0-3.17-1.23-6.15-3.5-8.42ZM12.14 21.76a9.9 9.9 0 0 1-5.05-1.39l-.36-.21-3.76.99 1-3.67-.24-.38a9.86 9.86 0 0 1-1.52-5.22c0-5.46 4.45-9.91 9.92-9.91a9.84 9.84 0 0 1 7.01 2.9 9.84 9.84 0 0 1 2.9 7.01c0 5.47-4.45 9.92-9.9 9.92Zm5.44-7.42c-.3-.15-1.77-.87-2.04-.97-.28-.1-.48-.15-.68.15-.2.3-.77.97-.94 1.17-.17.2-.35.22-.65.07-.3-.15-1.26-.47-2.4-1.5-.89-.8-1.5-1.78-1.68-2.08-.17-.3-.02-.46.13-.61.14-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.03-.52-.07-.15-.68-1.63-.93-2.24-.24-.59-.49-.5-.68-.51h-.58c-.2 0-.52.07-.8.37-.28.3-1.05 1.02-1.05 2.49s1.07 2.89 1.22 3.09c.15.2 2.1 3.21 5.1 4.5.71.3 1.27.49 1.7.62.71.23 1.36.2 1.87.12.57-.08 1.77-.72 2.02-1.42.25-.7.25-1.3.17-1.42-.07-.13-.27-.2-.57-.35Z"/></svg></a>
-  <script type="module" src="app.js"></script>
+      <span class="stat-divider"></span>
+      <div>
+        <span class="stat-price">$30–40 mil</span>
+        <small>por persona</small>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="ticker">
+  <div class="ticker-track">
+    <span>✳ LA GUADA · AYACUCHO 769</span>
+    <b>El fuego nos reúne.</b>
+    <span>✳ BUENOS MOMENTOS, SIN PRISA</span>
+    <b>UNA MESA LARGA</b>
+    <span>✳ SOBREMESA</span>
+    <b>PARA COMPARTIR</b>
+    <span>✳ HECHO A LAS BRASAS</span>
+    <b>✳ LA GUADA · AYACUCHO 769</b>
+    <span>✳ BUENOS MOMENTOS, SIN PRISA</span>
+    <b>UNA MESA LARGA</b>
+    <span>✳ SOBREMESA</span>
+    <b>PARA COMPARTIR</b>
+    <span>✳ HECHO A LAS BRASAS</span>
+  </div>
+</div>
+
+<section class="section-pad" id="historia">
+  <div class="story reveal">
+    <div class="story-photo">
+      <img src="https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=1100&q=85" alt="Interior La Guada">
+      <span class="photo-tag">CATAMARCA · ARG</span>
+      <span class="photo-index">01 / NUESTRO LUGAR</span>
+    </div>
+    <div class="story-copy">
+      <div class="kicker">
+        <i></i>
+        AL CALOR DE LAS BRASAS
+      </div>
+      <h2>Una mesa,<br>muchas <em>historias</em></h2>
+      <p>El fuego junta. La mesa acerca. En La Guada, la parrilla es el comienzo. Lo que sigue es de ustedes: reencontrarse, celebrar, pedir un poco más de pan y quedarse un ratito más.</p>
+      <p>Un lugar para disfrutar los sabores de siempre en San Fernando del Valle de Catamarca.</p>
+      <div class="story-signature">
+        Nos vemos alrededor del fuego — <span>La Guada</span>
+      </div>
+      <div class="story-stats">
+        <div>
+          <b>+0</b>
+          <small>opiniones</small>
+        </div>
+        <div>
+          <b>$30–40 mil</b>
+          <small>por persona</small>
+        </div>
+        <div>
+          <b>Catamarca</b>
+          <small>nuestro lugar</small>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="ritual" id="sabores">
+  <div class="section-intro reveal">
+    <div>
+      <div class="kicker">
+        <i></i>
+        01 — RESERVAS
+      </div>
+      <h2>El ritual<br>de <em>venir</em></h2>
+    </div>
+    <p>Más que comer. Encontrarse. Hay cosas que saben mejor cuando se comparten. Prepará el apetito; del resto nos encargamos entre todos.</p>
+  </div>
+  <div class="ritual-grid">
+    <div class="ritual-card card-large reveal">
+      <img src="https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=1100&q=85" alt="La parrilla">
+      <div class="card-meta">
+        <span>01 · EL CENTRO DE LA MESA</span>
+        <span>✳</span>
+      </div>
+      <div class="card-copy">
+        <h3>La parrilla</h3>
+        <p>Buenas brasas, tiempo y sabor de verdad.</p>
+      </div>
+    </div>
+    <div class="ritual-card sage-card reveal">
+      <div class="card-meta">
+        <span>02 · LO QUE VA AL MEDIO</span>
+        <span>✳</span>
+      </div>
+      <div class="card-copy">
+        <h3>Algo para compartir</h3>
+        <p>Que nadie se quede con las ganas.</p>
+      </div>
+      <div class="card-meta">
+        <span>pedimos otra ronda ↗</span>
+      </div>
+    </div>
+    <div class="ritual-card peach-card reveal">
+      <img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=900&q=80" alt="Sobremesa">
+      <div class="card-shade"></div>
+      <div class="card-meta">
+        <span>03 · QUEDARSE UN POCO MÁS</span>
+        <span>✳</span>
+      </div>
+      <div class="card-copy">
+        <h3>La sobremesa</h3>
+        <p>El mejor plan no mira el reloj.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="reservation" id="reservas">
+  <div class="reservation-inner">
+    <div class="reservation-copy reveal">
+      <div class="kicker">
+        <i></i>
+        nos vemos
+      </div>
+      <h2>Tu lugar<br>está por <em>acá</em></h2>
+      <p>El próximo brindis es tuyo. Completá tus datos y te llevamos a WhatsApp con el mensaje listo. La confirmación de disponibilidad la hacemos por ahí.</p>
+      <div class="reservation-points">
+        <div><b>✳</b> Elegí el día que te gustaría venir</div>
+        <div><b>✳</b> Te respondemos directo por WhatsApp</div>
+        <div><b>✳</b> Ayacucho 769, Catamarca</div>
+      </div>
+    </div>
+    <div class="booking-card reveal">
+      <div class="form-heading">
+        <span>01 — RESERVAS ✳</span>
+      </div>
+      <h3>Contanos de tu visita.</h3>
+      <p>Los campos con * son necesarios.</p>
+      <form id="booking-form">
+        <div class="form-grid">
+          <div class="field">
+            <span>Nombre y apellido <b>*</b></span>
+            <input type="text" name="name" required placeholder="Tu nombre completo">
+          </div>
+          <div class="field">
+            <span>Día y fecha <b>*</b></span>
+            <input type="date" name="date" id="date" required>
+          </div>
+          <div class="field field-wide">
+            <span>Asistentes <b>*</b> <small>¿Cuántos vienen?</small></span>
+            <select name="guests" required>
+              <option value="">Seleccioná</option>
+              <option value="1">1 persona</option>
+              <option value="2">2 personas</option>
+              <option value="3">3 personas</option>
+              <option value="4">4 personas</option>
+              <option value="5">5 personas</option>
+              <option value="6">6 personas</option>
+              <option value="7">7 personas</option>
+              <option value="8">8 personas</option>
+              <option value="9+">9 o más personas</option>
+            </select>
+          </div>
+          <div class="field field-wide">
+            <span>E-mail <small>opcional</small></span>
+            <input type="email" name="email" placeholder="tu@email.com">
+          </div>
+        </div>
+        <button type="submit" class="submit-button">
+          Preparar mensaje en WhatsApp
+          <span>↗</span>
+        </button>
+        <div class="form-foot">
+          <span>Tu reserva se consulta directamente con el restaurante.</span>
+          <span>✳</span>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+
+<section class="visit" id="visitanos">
+  <div class="visit-top reveal">
+    <div>
+      <div class="kicker">
+        <i></i>
+        VISITANOS
+      </div>
+      <h2>Estamos en<br>San <em>Fernando</em></h2>
+    </div>
+    <a href="https://maps.app.goo.gl/KJ2a1uYocxwdpvmW9" target="_blank" rel="noopener" class="pill-button dark-button">
+      Cómo llegar <span>↗</span>
+    </a>
+  </div>
+  <div class="visit-grid reveal">
+    <div class="map-wrap">
+      <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3456.789!2d-65.7789!3d-28.4696!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjjCsDI4JzEwLjYiUyA2NcKwNDYnNDQuMCJX!5e0!3m2!1ses!2sar!4v1234567890" allowfullscreen loading="lazy"></iframe>
+      <a href="https://maps.app.goo.gl/KJ2a1uYocxwdpvmW9" target="_blank" rel="noopener" class="map-open">Abrir en Google Maps ↗</a>
+    </div>
+    <div class="contact-card">
+      <div class="kicker">
+        <i></i>
+        A MANO
+      </div>
+      <h3>Un mensaje<br>y nos vemos.</h3>
+      <div class="contact-row">
+        <span>VISITANOS</span>
+        <a href="https://maps.app.goo.gl/KJ2a1uYocxwdpvmW9" target="_blank" rel="noopener">Ayacucho 769, K4700FVJ<br>San Fernando del Valle de Catamarca ↗</a>
+      </div>
+      <div class="contact-row">
+        <span>LLAMANOS</span>
+        <a href="tel:+543834033990">0383 403-3990 ↗</a>
+      </div>
+      <div class="contact-row">
+        <span>HORARIOS</span>
+        <span>Consultanos por WhatsApp para confirmar horarios y disponibilidad.</span>
+      </div>
+      <a href="https://www.facebook.com/laguadaparrilla/" target="_blank" rel="noopener" class="social-link">
+        Encontranos en Facebook
+        <span>↗</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="footer-main">
+    <a href="#inicio" class="wordmark">
+      <span class="brand-stamp">LG</span>
+      <div>
+        la guada
+        <small>parrilla de barrio</small>
+      </div>
+    </a>
+    <div class="footer-contact">
+      <a href="tel:+543834033990">0383 403-3990</a>
+      <a href="https://maps.app.goo.gl/KJ2a1uYocxwdpvmW9" target="_blank" rel="noopener">Ayacucho 769, Catamarca</a>
+      <a href="https://www.facebook.com/laguadaparrilla/" target="_blank" rel="noopener">Facebook ↗</a>
+      <a href="#reservas" class="footer-book">Reservá tu mesa ↑</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© <span id="year"></span> La Guada Parrilla · San Fernando del Valle de Catamarca</span>
+    <span>Hecho para compartir <b>✳</b></span>
+  </div>
+</footer>
+
+<a href="https://wa.me/5493834033990" target="_blank" rel="noopener" class="wa-float" aria-label="WhatsApp">
+  <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+</a>
+
+<script>
+// Scroll progress
+const scrollProgress = document.querySelector('#scroll-progress-fill');
+window.addEventListener('scroll', () => {
+  const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+  if (scrollProgress && maxScroll > 0) {
+    scrollProgress.style.width = `${(window.scrollY / maxScroll) * 100}%`;
+  }
+}, { passive: true });
+
+// Count up animation
+function countUp(element) {
+  const target = Number(element.dataset.count);
+  const started = performance.now();
+  const duration = 1800;
+  
+  function step(now) {
+    const progress = Math.min(1, (now - started) / duration);
+    const eased = 1 - Math.pow(1 - progress, 3);
+    const value = Math.round(target * eased);
+    element.textContent = value.toLocaleString('es-AR');
+    if (progress < 1) requestAnimationFrame(step);
+  }
+  
+  requestAnimationFrame(step);
+}
+
+const countElements = document.querySelectorAll('[data-count]');
+if ('IntersectionObserver' in window) {
+  const countObserver = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        countUp(entry.target);
+        countObserver.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.7 });
+  
+  countElements.forEach(element => countObserver.observe(element));
+} else {
+  countElements.forEach(countUp);
+}
+
+// Reveal on scroll
+const revealItems = document.querySelectorAll('.reveal');
+if ('IntersectionObserver' in window) {
+  const revealObserver = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        revealObserver.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.12 });
+  
+  revealItems.forEach(item => revealObserver.observe(item));
+} else {
+  revealItems.forEach(item => item.classList.add('visible'));
+}
+
+// Date input min
+const dateInput = document.querySelector('#date');
+const today = new Date();
+today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
+dateInput.min = today.toISOString().slice(0, 10);
+
+// Year
+document.querySelector('#year').textContent = new Date().getFullYear();
+
+// Booking form
+document.querySelector('#booking-form').addEventListener('submit', event => {
+  event.preventDefault();
+  if (!event.currentTarget.reportValidity()) return;
+  
+  const data = new FormData(event.currentTarget);
+  const date = new Date(`${data.get('date')}T12:00:00`).toLocaleDateString('es-AR', {
+    weekday: 'long',
+    day: '2-digit',
+    month: 'long',
+    year: 'numeric',
+  });
+  
+  const message = [
+    'Hola La Guada, quiero consultar disponibilidad para una reserva:',
+    '',
+    `Nombre y apellido: ${data.get('name')}`,
+    `Día y fecha: ${date}`,
+    `Cantidad de asistentes: ${data.get('guests')}`,
+    `E-mail: ${data.get('email') || 'No informado'}`,
+    '',
+    '¡Gracias!',
+  ].join('\n');
+  
+  window.open(`https://wa.me/5493834033990?text=${encodeURIComponent(message)}`, '_blank', 'noopener,noreferrer');
+});
+</script>
+
 </body>
 </html>
