@@ -34,6 +34,7 @@ body {
 }
 a { color: inherit; text-decoration: none; }
 button, input, select { font: inherit; }
+h1, h2, h3, p { margin-top: 0; }
 
 /* Progress Bar */
 .scroll-progress {
@@ -135,6 +136,7 @@ nav > a:not(.nav-reserve):hover { color: var(--terracotta); }
   gap: 17px;
   transition: transform .25s, box-shadow .25s;
 }
+.nav-reserve span, .pill-button span { font-size: 1rem; }
 .nav-reserve:hover, .pill-button:hover {
   transform: translateY(-3px);
   box-shadow: 0 10px 20px #bb604d30;
@@ -149,6 +151,7 @@ nav > a:not(.nav-reserve):hover { color: var(--terracotta); }
   padding: 65px 7vw 78px;
   position: relative;
   overflow: hidden;
+  isolation: isolate;
 }
 .hero-bg {
   position: absolute;
@@ -156,40 +159,83 @@ nav > a:not(.nav-reserve):hover { color: var(--terracotta); }
   z-index: 0;
   overflow: hidden;
 }
-.hero-bg img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center;
-  filter: saturate(1.05) brightness(.75);
-  animation: zoomOut 20s ease-out forwards, subtleMove 30s ease-in-out infinite alternate;
+/* capa 1 — parallax con scroll + mouse */
+.hero-parallax {
+  position: absolute;
+  inset: -7%;
+  will-change: transform;
+  transform: translate3d(var(--px, 0px), var(--py, 0px), 0);
+  transition: transform .5s cubic-bezier(.2,.7,.2,1);
+}
+/* capa 2 — efecto de alejamiento inicial para ver todo el contexto */
+.hero-zoom {
+  position: absolute;
+  inset: 0;
+  animation: zoomOut 2.6s cubic-bezier(.22,.8,.28,1) both;
   will-change: transform;
 }
 @keyframes zoomOut {
-  0% { transform: scale(1.3); }
+  0%   { transform: scale(1.38); }
   100% { transform: scale(1); }
 }
-@keyframes subtleMove {
-  0% { object-position: 50% 50%; }
-  100% { object-position: 55% 45%; }
+/* capa 3 — respiración continua (movimiento vivo) */
+.hero-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 52% 44%;
+  display: block;
+  filter: saturate(1.06) brightness(.76);
+  animation: heroBreathe 24s ease-in-out infinite alternate;
+  will-change: transform;
+}
+@keyframes heroBreathe {
+  0%   { transform: scale(1.02) translate3d(0,0,0); }
+  50%  { transform: scale(1.09) translate3d(-1.2%,-.8%,0); }
+  100% { transform: scale(1.05) translate3d(1%,-1.4%,0); }
 }
 .hero-bg:after {
   content: '';
   position: absolute;
   inset: 0;
+  z-index: 2;
   background: linear-gradient(90deg, #2d2420ee 0%, #2d2420cc 40%, #2d242066 70%, transparent 100%),
               linear-gradient(0deg, #2d2420aa 0%, transparent 40%);
+  pointer-events: none;
+}
+.hero-embers {
+  position: absolute;
+  inset: 0;
   z-index: 1;
+  pointer-events: none;
+  overflow: hidden;
+}
+.ember {
+  position: absolute;
+  bottom: -12px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--butter);
+  box-shadow: 0 0 10px 3px #f5d67a66;
+  opacity: 0;
+  animation: emberRise linear infinite;
+}
+@keyframes emberRise {
+  0%   { opacity: 0; transform: translate3d(0,0,0) scale(.6); }
+  12%  { opacity: .9; }
+  70%  { opacity: .55; }
+  100% { opacity: 0; transform: translate3d(var(--drift,30px), -78vh, 0) scale(1.1); }
 }
 .hero-content {
   position: relative;
-  z-index: 2;
+  z-index: 3;
   max-width: 620px;
   animation: riseIn .85s .1s both;
 }
 @keyframes riseIn {
   from { opacity: 0; transform: translateY(24px); }
-  to { opacity: 1; transform: none; }
+  to   { opacity: 1; transform: none; }
 }
 .kicker {
   display: inline-flex;
@@ -213,10 +259,7 @@ nav > a:not(.nav-reserve):hover { color: var(--terracotta); }
   margin: 27px 0 24px;
   color: #fff8eb;
 }
-.hero h1 em {
-  color: var(--butter);
-  font-weight: 400;
-}
+.hero h1 em { color: var(--butter); font-weight: 400; }
 .hero-content > p {
   color: #f4e4dc;
   font-size: .95rem;
@@ -255,6 +298,8 @@ nav > a:not(.nav-reserve):hover { color: var(--terracotta); }
   font: 2.35rem var(--display);
   color: #fff8ec;
   font-variant-numeric: tabular-nums;
+  display: inline-block;
+  min-width: 1ch;
 }
 .stat-divider {
   height: 32px;
@@ -274,8 +319,9 @@ nav > a:not(.nav-reserve):hover { color: var(--terracotta); }
   text-transform: uppercase;
 }
 
-/* Ticker */
+/* Ticker — banner infinito */
 .ticker {
+  position: relative;
   overflow: hidden;
   background: var(--butter);
   height: 64px;
@@ -284,30 +330,51 @@ nav > a:not(.nav-reserve):hover { color: var(--terracotta); }
   color: var(--charcoal);
   box-shadow: inset 0 1px #fff6d5, inset 0 -1px #dfbd56;
 }
+.ticker:before, .ticker:after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 90px;
+  z-index: 3;
+  pointer-events: none;
+}
+.ticker:before { left: 0; background: linear-gradient(90deg, var(--butter), transparent); }
+.ticker:after  { right: 0; background: linear-gradient(270deg, var(--butter), transparent); }
 .ticker-track {
   display: flex;
   align-items: center;
-  justify-content: space-around;
+  width: max-content;
+  animation: tickerScroll 28s linear infinite;
+  will-change: transform;
+}
+.ticker:hover .ticker-track { animation-play-state: paused; }
+.ticker-group {
+  display: flex;
+  align-items: center;
   gap: 38px;
-  min-width: max-content;
-  width: 100%;
-  animation: ticker 23s linear infinite;
+  padding-right: 38px;
+  flex: 0 0 auto;
   font-size: .7rem;
   font-weight: 700;
   letter-spacing: .17em;
+  white-space: nowrap;
 }
-.ticker-track b {
-  font-size: 1rem;
+.ticker-group b { font-size: 1rem; color: var(--terracotta); }
+.ticker-group i {
+  font-style: normal;
   color: var(--terracotta);
+  animation: tickerSpin 6s linear infinite;
+  display: inline-block;
 }
-@keyframes ticker {
-  to { transform: translateX(-50%); }
+@keyframes tickerSpin { to { transform: rotate(360deg); } }
+@keyframes tickerScroll {
+  from { transform: translate3d(0, 0, 0); }
+  to   { transform: translate3d(-50%, 0, 0); }
 }
 
 /* Sections */
-.section-pad {
-  padding: 125px max(7vw, 30px);
-}
+.section-pad { padding: 125px max(7vw, 30px); }
 
 /* Story */
 .story {
@@ -326,9 +393,12 @@ nav > a:not(.nav-reserve):hover { color: var(--terracotta); }
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: center;
   display: block;
-  filter: saturate(.85);
+  filter: saturate(.9);
+  transition: transform .9s cubic-bezier(.2,.7,.2,1);
 }
+.story-photo:hover img { transform: scale(1.05); }
 .photo-tag, .photo-index {
   position: absolute;
   padding: 10px 12px;
@@ -336,6 +406,7 @@ nav > a:not(.nav-reserve):hover { color: var(--terracotta); }
   font-size: .52rem;
   letter-spacing: .12em;
   font-weight: 700;
+  z-index: 2;
 }
 .photo-tag { top: 17px; left: 17px; }
 .photo-index { right: 17px; bottom: 17px; background: var(--butter); }
@@ -355,10 +426,7 @@ nav > a:not(.nav-reserve):hover { color: var(--terracotta); }
   font-size: .86rem;
   line-height: 1.85;
 }
-.story-signature {
-  margin-top: 27px;
-  font: italic 1.08rem var(--display);
-}
+.story-signature { margin-top: 27px; font: italic 1.08rem var(--display); }
 .story-signature span { color: var(--muted); }
 .story-stats {
   display: flex;
@@ -368,7 +436,7 @@ nav > a:not(.nav-reserve):hover { color: var(--terracotta); }
   padding-top: 19px;
 }
 .story-stats > div { display: grid; gap: 3px; }
-.story-stats b { font: 1.15rem var(--display); }
+.story-stats b { font: 1.15rem var(--display); font-variant-numeric: tabular-nums; }
 .story-stats small {
   font-size: .53rem;
   text-transform: uppercase;
@@ -377,11 +445,7 @@ nav > a:not(.nav-reserve):hover { color: var(--terracotta); }
 }
 
 /* Ritual */
-.ritual {
-  background: #eee3ff;
-  padding-top: 103px;
-  padding-bottom: 119px;
-}
+.ritual { background: #eee3ff; padding-top: 103px; padding-bottom: 119px; }
 .section-intro {
   display: flex;
   align-items: end;
@@ -389,14 +453,8 @@ nav > a:not(.nav-reserve):hover { color: var(--terracotta); }
   margin: 0 auto 43px;
   max-width: 1120px;
 }
-.section-intro h2 {
-  font-size: clamp(3rem, 5vw, 4.8rem);
-  margin-bottom: 0;
-}
-.section-intro > p {
-  max-width: 310px;
-  margin: 0 4% 7px 20px;
-}
+.section-intro h2 { font-size: clamp(3rem, 5vw, 4.8rem); margin-bottom: 0; }
+.section-intro > p { max-width: 310px; margin: 0 4% 7px 20px; }
 .ritual-grid {
   max-width: 1120px;
   margin: auto;
@@ -415,12 +473,7 @@ nav > a:not(.nav-reserve):hover { color: var(--terracotta); }
   transition: transform .3s;
 }
 .ritual-card:hover { transform: translateY(-4px); }
-.card-large {
-  grid-row: span 2;
-  min-height: 526px;
-  background: var(--sage);
-  color: #fff;
-}
+.card-large { grid-row: span 2; min-height: 526px; background: var(--sage); color: #fff; }
 .ritual-card img, .card-shade {
   position: absolute;
   inset: 0;
@@ -428,10 +481,7 @@ nav > a:not(.nav-reserve):hover { color: var(--terracotta); }
   height: 100%;
   object-fit: cover;
 }
-.card-large img {
-  filter: brightness(.75) saturate(.78);
-  transition: transform .8s;
-}
+.card-large img { filter: brightness(.75) saturate(.78); transition: transform .8s; }
 .ritual-card:hover img { transform: scale(1.05); }
 .card-large:after {
   content: '';
@@ -439,10 +489,7 @@ nav > a:not(.nav-reserve):hover { color: var(--terracotta); }
   inset: 25% 0 0;
   background: linear-gradient(transparent, #201913b8);
 }
-.card-meta, .card-copy {
-  position: relative;
-  z-index: 1;
-}
+.card-meta, .card-copy { position: relative; z-index: 1; }
 .card-meta {
   display: flex;
   justify-content: space-between;
@@ -450,29 +497,13 @@ nav > a:not(.nav-reserve):hover { color: var(--terracotta); }
   font-weight: 700;
   letter-spacing: .12em;
 }
-.card-copy h3 {
-  font: 2.35rem var(--display);
-  letter-spacing: -.03em;
-  margin: 0 0 1px;
-}
+.card-copy h3 { font: 2.35rem var(--display); letter-spacing: -.03em; margin: 0 0 1px; }
 .card-copy p { font-size: .72rem; margin: 0; }
-.sage-card {
-  background: #c9e9c1;
-  color: #39443a;
-}
+.sage-card { background: #c9e9c1; color: #39443a; }
 .sage-card .card-copy p { color: #566250; }
-.peach-card {
-  background: var(--ember);
-  color: #fff;
-}
-.peach-card img {
-  filter: brightness(.6) saturate(.8);
-  transition: transform .8s;
-}
-.peach-card .card-shade {
-  background: linear-gradient(0deg, #39241fc9, transparent 80%);
-  z-index: 0;
-}
+.peach-card { background: var(--ember); color: #fff; }
+.peach-card img { filter: brightness(.6) saturate(.8); transition: transform .8s; }
+.peach-card .card-shade { background: linear-gradient(0deg, #39241fc9, transparent 80%); z-index: 0; }
 
 /* Reservation */
 .reservation {
@@ -494,23 +525,10 @@ nav > a:not(.nav-reserve):hover { color: var(--terracotta); }
 }
 .reservation .kicker { color: #ffead7; }
 .reservation .kicker i { background: #f8d6b9; }
-.reservation h2 {
-  font-size: clamp(3.7rem, 6vw, 6rem);
-}
+.reservation h2 { font-size: clamp(3.7rem, 6vw, 6rem); }
 .reservation h2 em { color: var(--butter); }
-.reservation-copy > p {
-  max-width: 390px;
-  font-size: .84rem;
-  color: #ffe6d6;
-  line-height: 1.8;
-}
-.reservation-points {
-  display: grid;
-  gap: 13px;
-  margin-top: 28px;
-  font-size: .7rem;
-  color: #fff1e5;
-}
+.reservation-copy > p { max-width: 390px; font-size: .84rem; color: #ffe6d6; line-height: 1.8; }
+.reservation-points { display: grid; gap: 13px; margin-top: 28px; font-size: .7rem; color: #fff1e5; }
 .reservation-points b { color: var(--butter); padding-right: 9px; }
 .booking-card {
   background: var(--cream);
@@ -527,29 +545,14 @@ nav > a:not(.nav-reserve):hover { color: var(--terracotta); }
   font-weight: 700;
   letter-spacing: .16em;
 }
-.booking-card h3 {
-  font: 2rem var(--display);
-  margin: 9px 0 3px;
-}
-.booking-card > p {
-  font-size: .69rem;
-  color: var(--muted);
-  margin-bottom: 23px;
-}
-.form-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 17px 13px;
-}
+.booking-card h3 { font: 2rem var(--display); margin: 9px 0 3px; }
+.booking-card > p { font-size: .69rem; color: var(--muted); margin-bottom: 23px; }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 17px 13px; }
 .field { display: grid; gap: 7px; }
 .field-wide { grid-column: 1 / -1; }
 .field > span { font-size: .65rem; font-weight: 700; }
 .field > span b { color: var(--terracotta); }
-.field > span small {
-  font-size: .58rem;
-  color: #90847a;
-  font-weight: 400;
-}
+.field > span small { font-size: .58rem; color: #90847a; font-weight: 400; }
 .field input, .field select {
   width: 100%;
   height: 44px;
@@ -566,6 +569,7 @@ nav > a:not(.nav-reserve):hover { color: var(--terracotta); }
   border-color: var(--terracotta);
   box-shadow: 0 0 0 3px #bd705f18;
 }
+.field input::placeholder { color: #a79a90; }
 .submit-button {
   width: 100%;
   height: 48px;
@@ -582,10 +586,8 @@ nav > a:not(.nav-reserve):hover { color: var(--terracotta); }
   cursor: pointer;
   transition: background .2s, transform .2s;
 }
-.submit-button:hover {
-  background: #4a3d3a;
-  transform: translateY(-2px);
-}
+.submit-button span { font-size: 1rem; }
+.submit-button:hover { background: #4a3d3a; transform: translateY(-2px); }
 .form-foot {
   display: flex;
   justify-content: space-between;
@@ -593,12 +595,10 @@ nav > a:not(.nav-reserve):hover { color: var(--terracotta); }
   font-size: .53rem;
   color: #8d8177;
 }
+.form-foot span:last-child { color: var(--terracotta); }
 
 /* Visit */
-.visit {
-  padding-top: 112px;
-  padding-bottom: 113px;
-}
+.visit { padding-top: 112px; padding-bottom: 113px; }
 .visit-top {
   max-width: 1120px;
   margin: 0 auto 35px;
@@ -607,10 +607,7 @@ nav > a:not(.nav-reserve):hover { color: var(--terracotta); }
   align-items: end;
 }
 .visit h2 { margin-bottom: 0; }
-.dark-button {
-  background: var(--charcoal);
-  margin-bottom: 8px;
-}
+.dark-button { background: var(--charcoal); margin-bottom: 8px; }
 .dark-button:hover { box-shadow: 0 10px 20px #594b6230; }
 .visit-grid {
   max-width: 1120px;
@@ -619,12 +616,7 @@ nav > a:not(.nav-reserve):hover { color: var(--terracotta); }
   grid-template-columns: 1.35fr .65fr;
   min-height: 420px;
 }
-.map-wrap {
-  position: relative;
-  min-height: 420px;
-  background: var(--sage);
-  overflow: hidden;
-}
+.map-wrap { position: relative; min-height: 420px; background: var(--sage); overflow: hidden; }
 .map-wrap iframe {
   width: 100%;
   height: 100%;
@@ -644,12 +636,7 @@ nav > a:not(.nav-reserve):hover { color: var(--terracotta); }
   transition: transform .2s;
 }
 .map-open:hover { transform: translateY(-2px); }
-.contact-card {
-  background: var(--sage);
-  padding: 39px 37px;
-  position: relative;
-  overflow: hidden;
-}
+.contact-card { background: var(--sage); padding: 39px 37px; position: relative; overflow: hidden; }
 .contact-card .kicker { position: relative; }
 .contact-card h3 {
   position: relative;
@@ -657,23 +644,14 @@ nav > a:not(.nav-reserve):hover { color: var(--terracotta); }
   letter-spacing: -.03em;
   margin: 16px 0 29px;
 }
-.contact-row {
-  display: grid;
-  gap: 6px;
-  padding: 13px 0;
-  border-top: 1px solid #3946382a;
-}
+.contact-row { display: grid; gap: 6px; padding: 13px 0; border-top: 1px solid #3946382a; }
 .contact-row > span:first-child {
   font-size: .52rem;
   font-weight: 700;
   letter-spacing: .13em;
   color: #667364;
 }
-.contact-row > a, .contact-row > span:last-child {
-  font-size: .67rem;
-  line-height: 1.55;
-  color: #465044;
-}
+.contact-row > a, .contact-row > span:last-child { font-size: .67rem; line-height: 1.55; color: #465044; }
 .contact-row > a:hover { color: var(--terracotta); }
 .social-link {
   display: flex;
@@ -688,11 +666,7 @@ nav > a:not(.nav-reserve):hover { color: var(--terracotta); }
 .social-link span { color: var(--terracotta); }
 
 /* Footer */
-.site-footer {
-  background: var(--charcoal);
-  color: #f7eee5;
-  padding: 40px max(7vw, 30px) 25px;
-}
+.site-footer { background: var(--charcoal); color: #f7eee5; padding: 40px max(7vw, 30px) 25px; }
 .footer-main {
   max-width: 1120px;
   margin: auto;
@@ -701,10 +675,7 @@ nav > a:not(.nav-reserve):hover { color: var(--terracotta); }
   justify-content: space-between;
   gap: 25px;
 }
-.site-footer .brand-stamp {
-  color: var(--butter);
-  border-color: var(--butter);
-}
+.site-footer .brand-stamp { color: var(--butter); border-color: var(--butter); }
 .site-footer .wordmark small { color: #d2c2c5; }
 .footer-contact {
   display: flex;
@@ -714,11 +685,7 @@ nav > a:not(.nav-reserve):hover { color: var(--terracotta); }
   font-size: .66rem;
 }
 .footer-contact a:hover { color: var(--butter); }
-.footer-book {
-  font-size: .69rem;
-  font-weight: 700;
-  color: var(--butter);
-}
+.footer-book { font-size: .69rem; font-weight: 700; color: var(--butter); }
 .footer-bottom {
   max-width: 1120px;
   margin: 22px auto 0;
@@ -747,21 +714,16 @@ nav > a:not(.nav-reserve):hover { color: var(--terracotta); }
   box-shadow: 0 7px 22px #223b2a45;
   transition: transform .25s;
 }
-.wa-float:hover {
-  transform: translateY(-4px) rotate(-8deg);
-}
+.wa-float:hover { transform: translateY(-4px) rotate(-8deg); }
 .wa-float svg { width: 24px; height: 24px; fill: currentColor; }
 
 /* Reveal Animation */
 .reveal {
   opacity: 0;
   transform: translateY(24px);
-  transition: opacity .7s ease, transform .7s cubic-bezier(.2, .7, .2, 1);
+  transition: opacity .7s ease, transform .7s cubic-bezier(.2,.7,.2,1);
 }
-.reveal.visible {
-  opacity: 1;
-  transform: none;
-}
+.reveal.visible { opacity: 1; transform: none; }
 .ritual-card.reveal:nth-child(2) { transition-delay: .1s; }
 .ritual-card.reveal:nth-child(3) { transition-delay: .2s; }
 
@@ -797,9 +759,12 @@ nav > a:not(.nav-reserve):hover { color: var(--terracotta); }
   }
   .hero-content { width: 100%; padding-top: 23px; }
   .hero h1 { font-size: clamp(4.35rem, 18vw, 6.3rem); }
+  .hero-photo { object-position: 52% 30%; filter: saturate(1) brightness(.6); }
   .hero-stats { margin-top: 32px; }
   .ticker { height: 53px; }
-  .ticker-track { gap: 25px; font-size: .58rem; }
+  .ticker:before, .ticker:after { width: 44px; }
+  .ticker-group { gap: 25px; padding-right: 25px; font-size: .58rem; }
+  .ticker-group b { font-size: .84rem; }
   .section-pad { padding: 77px 19px; }
   .story { grid-template-columns: 1fr; gap: 37px; }
   .story-photo { height: 350px; margin: 0 8px; }
@@ -869,7 +834,11 @@ nav > a:not(.nav-reserve):hover { color: var(--terracotta); }
     transition-duration: .01ms !important;
   }
   .reveal { opacity: 1; transform: none; }
-  .hero-bg img { animation: none; }
+  .hero-parallax { transform: none !important; }
+  .hero-zoom { transform: scale(1); }
+  .hero-photo { transform: scale(1.04); }
+  .ticker-track { transform: none; }
+  .ember { display: none; }
 }
 </style>
 </head>
@@ -900,8 +869,14 @@ nav > a:not(.nav-reserve):hover { color: var(--terracotta); }
 
 <section class="hero" id="inicio">
   <div class="hero-bg">
-    <img src="https://images.unsplash.com/photo-1558030006-450675393462?auto=format&fit=crop&w=1920&q=85" alt="Parrilla La Guada">
+    <div class="hero-parallax">
+      <div class="hero-zoom">
+        <img class="hero-photo" src="https://images.unsplash.com/photo-1558030006-450675393462?auto=format&fit=crop&w=1920&q=85" alt="La Guada — parrilla argentina con brasas encendidas">
+      </div>
+    </div>
+    <div class="hero-embers" aria-hidden="true"></div>
   </div>
+
   <div class="hero-content">
     <div class="kicker">
       <i></i>
@@ -915,7 +890,7 @@ nav > a:not(.nav-reserve):hover { color: var(--terracotta); }
     </div>
     <div class="hero-stats">
       <div>
-        <span class="stat-number" data-count="1257">0</span>
+        <span class="stat-number" data-count="1257" data-format="locale">0</span>
         personas dejaron<br>su opinión
       </div>
       <span class="stat-divider"></span>
@@ -928,27 +903,33 @@ nav > a:not(.nav-reserve):hover { color: var(--terracotta); }
 </section>
 
 <div class="ticker">
-  <div class="ticker-track">
-    <span>✳ LA GUADA · AYACUCHO 769</span>
-    <b>El fuego nos reúne.</b>
-    <span>✳ BUENOS MOMENTOS, SIN PRISA</span>
-    <b>UNA MESA LARGA</b>
-    <span>✳ SOBREMESA</span>
-    <b>PARA COMPARTIR</b>
-    <span>✳ HECHO A LAS BRASAS</span>
-    <b>✳ LA GUADA · AYACUCHO 769</b>
-    <span>✳ BUENOS MOMENTOS, SIN PRISA</span>
-    <b>UNA MESA LARGA</b>
-    <span>✳ SOBREMESA</span>
-    <b>PARA COMPARTIR</b>
-    <span>✳ HECHO A LAS BRASAS</span>
+  <div class="ticker-track" id="ticker-track">
+    <div class="ticker-group">
+      <span><i>✳</i> LA GUADA · AYACUCHO 769</span>
+      <b>El fuego nos reúne.</b>
+      <span><i>✳</i> BUENOS MOMENTOS, SIN PRISA</span>
+      <b>UNA MESA LARGA</b>
+      <span><i>✳</i> SOBREMESA</span>
+      <b>PARA COMPARTIR</b>
+      <span><i>✳</i> HECHO A LAS BRASAS</span>
+    </div>
+    <div class="ticker-group" aria-hidden="true">
+      <span><i>✳</i> LA GUADA · AYACUCHO 769</span>
+      <b>El fuego nos reúne.</b>
+      <span><i>✳</i> BUENOS MOMENTOS, SIN PRISA</span>
+      <b>UNA MESA LARGA</b>
+      <span><i>✳</i> SOBREMESA</span>
+      <b>PARA COMPARTIR</b>
+      <span><i>✳</i> HECHO A LAS BRASAS</span>
+    </div>
   </div>
 </div>
 
 <section class="section-pad" id="historia">
   <div class="story reveal">
     <div class="story-photo">
-      <img src="https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=1100&q=85" alt="Interior La Guada">
+      <img src="LAGUADA.jpg" alt="La Guada — nuestro local en Catamarca"
+           onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=1100&q=85';">
       <span class="photo-tag">CATAMARCA · ARG</span>
       <span class="photo-index">01 / NUESTRO LUGAR</span>
     </div>
@@ -965,7 +946,7 @@ nav > a:not(.nav-reserve):hover { color: var(--terracotta); }
       </div>
       <div class="story-stats">
         <div>
-          <b>+0</b>
+          <b data-count="1257" data-format="locale">0</b>
           <small>opiniones</small>
         </div>
         <div>
@@ -1018,7 +999,7 @@ nav > a:not(.nav-reserve):hover { color: var(--terracotta); }
       </div>
     </div>
     <div class="ritual-card peach-card reveal">
-      <img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=900&q=80" alt="Sobremesa">
+      <img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=900&q=80" alt="La sobremesa">
       <div class="card-shade"></div>
       <div class="card-meta">
         <span>03 · QUEDARSE UN POCO MÁS</span>
@@ -1111,7 +1092,7 @@ nav > a:not(.nav-reserve):hover { color: var(--terracotta); }
   </div>
   <div class="visit-grid reveal">
     <div class="map-wrap">
-      <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3456.789!2d-65.7789!3d-28.4696!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjjCsDI4JzEwLjYiUyA2NcKwNDYnNDQuMCJX!5e0!3m2!1ses!2sar!4v1234567890" allowfullscreen loading="lazy"></iframe>
+      <iframe src="https://www.google.com/maps?q=Ayacucho%20769%2C%20San%20Fernando%20del%20Valle%20de%20Catamarca&output=embed" allowfullscreen loading="lazy" title="Mapa de La Guada Parrilla"></iframe>
       <a href="https://maps.app.goo.gl/KJ2a1uYocxwdpvmW9" target="_blank" rel="noopener" class="map-open">Abrir en Google Maps ↗</a>
     </div>
     <div class="contact-card">
@@ -1162,34 +1143,91 @@ nav > a:not(.nav-reserve):hover { color: var(--terracotta); }
   </div>
 </footer>
 
-<a href="https://wa.me/5493834033990" target="_blank" rel="noopener" class="wa-float" aria-label="WhatsApp">
+<a href="https://wa.me/5493834033990" target="_blank" rel="noopener" class="wa-float" aria-label="Escribinos por WhatsApp">
   <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
 </a>
 
 <script>
-// Scroll progress
+const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ---------- Barra de progreso + parallax de la imagen principal ---------- */
+const heroSection = document.querySelector('.hero');
+const heroParallax = document.querySelector('.hero-parallax');
 const scrollProgress = document.querySelector('#scroll-progress-fill');
-window.addEventListener('scroll', () => {
+let scrollQueued = false;
+let pointerX = 0;
+let pointerY = 0;
+
+function updateHeroMotion() {
   const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
-  if (scrollProgress && maxScroll > 0) {
-    scrollProgress.style.width = `${(window.scrollY / maxScroll) * 100}%`;
+  if (scrollProgress) {
+    scrollProgress.style.width = `${maxScroll > 0 ? (window.scrollY / maxScroll) * 100 : 0}%`;
+  }
+  if (heroSection && heroParallax && !prefersReducedMotion) {
+    const bounds = heroSection.getBoundingClientRect();
+    const scrollOffset = Math.max(-40, Math.min(40, (window.innerHeight / 2 - bounds.top) * 0.06));
+    heroParallax.style.setProperty('--py', `${scrollOffset.toFixed(1)}px`);
+    heroParallax.style.setProperty('--px', `${pointerX.toFixed(1)}px`);
+    heroParallax.style.transform =
+      `translate3d(${pointerX.toFixed(1)}px, ${(scrollOffset + pointerY).toFixed(1)}px, 0)`;
+  }
+  scrollQueued = false;
+}
+
+window.addEventListener('scroll', () => {
+  if (!scrollQueued) {
+    scrollQueued = true;
+    requestAnimationFrame(updateHeroMotion);
   }
 }, { passive: true });
 
-// Count up animation
+if (heroSection && !prefersReducedMotion && window.matchMedia('(pointer:fine)').matches) {
+  heroSection.addEventListener('pointermove', event => {
+    const rect = heroSection.getBoundingClientRect();
+    pointerX = ((event.clientX - rect.left) / rect.width - 0.5) * -18;
+    pointerY = ((event.clientY - rect.top) / rect.height - 0.5) * -12;
+    if (!scrollQueued) { scrollQueued = true; requestAnimationFrame(updateHeroMotion); }
+  }, { passive: true });
+  heroSection.addEventListener('pointerleave', () => {
+    pointerX = 0;
+    pointerY = 0;
+    updateHeroMotion();
+  }, { passive: true });
+}
+updateHeroMotion();
+
+/* ---------- Brasas flotantes sobre la portada ---------- */
+const emberLayer = document.querySelector('.hero-embers');
+if (emberLayer && !prefersReducedMotion) {
+  const emberCount = 16;
+  for (let emberIndex = 0; emberIndex < emberCount; emberIndex++) {
+    const emberDot = document.createElement('span');
+    emberDot.className = 'ember';
+    const size = 3 + Math.random() * 5;
+    emberDot.style.left = `${Math.random() * 100}%`;
+    emberDot.style.width = `${size}px`;
+    emberDot.style.height = `${size}px`;
+    emberDot.style.setProperty('--drift', `${(Math.random() - 0.5) * 130}px`);
+    emberDot.style.animationDuration = `${9 + Math.random() * 11}s`;
+    emberDot.style.animationDelay = `${-Math.random() * 16}s`;
+    emberLayer.appendChild(emberDot);
+  }
+}
+
+/* ---------- Contadores ascendentes ---------- */
 function countUp(element) {
   const target = Number(element.dataset.count);
+  const useLocale = element.dataset.format === 'locale';
   const started = performance.now();
-  const duration = 1800;
-  
+  const duration = 1600;
+
   function step(now) {
     const progress = Math.min(1, (now - started) / duration);
     const eased = 1 - Math.pow(1 - progress, 3);
     const value = Math.round(target * eased);
-    element.textContent = value.toLocaleString('es-AR');
+    element.textContent = useLocale ? value.toLocaleString('es-AR') : String(value);
     if (progress < 1) requestAnimationFrame(step);
   }
-  
   requestAnimationFrame(step);
 }
 
@@ -1202,14 +1240,13 @@ if ('IntersectionObserver' in window) {
         countObserver.unobserve(entry.target);
       }
     });
-  }, { threshold: 0.7 });
-  
+  }, { threshold: 0.6 });
   countElements.forEach(element => countObserver.observe(element));
 } else {
   countElements.forEach(countUp);
 }
 
-// Reveal on scroll
+/* ---------- Revelado suave de secciones ---------- */
 const revealItems = document.querySelectorAll('.reveal');
 if ('IntersectionObserver' in window) {
   const revealObserver = new IntersectionObserver(entries => {
@@ -1220,26 +1257,24 @@ if ('IntersectionObserver' in window) {
       }
     });
   }, { threshold: 0.12 });
-  
   revealItems.forEach(item => revealObserver.observe(item));
 } else {
   revealItems.forEach(item => item.classList.add('visible'));
 }
 
-// Date input min
+/* ---------- Fecha mínima del formulario ---------- */
 const dateInput = document.querySelector('#date');
 const today = new Date();
 today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
 dateInput.min = today.toISOString().slice(0, 10);
 
-// Year
 document.querySelector('#year').textContent = new Date().getFullYear();
 
-// Booking form
+/* ---------- Reserva vía WhatsApp ---------- */
 document.querySelector('#booking-form').addEventListener('submit', event => {
   event.preventDefault();
   if (!event.currentTarget.reportValidity()) return;
-  
+
   const data = new FormData(event.currentTarget);
   const date = new Date(`${data.get('date')}T12:00:00`).toLocaleDateString('es-AR', {
     weekday: 'long',
@@ -1247,7 +1282,7 @@ document.querySelector('#booking-form').addEventListener('submit', event => {
     month: 'long',
     year: 'numeric',
   });
-  
+
   const message = [
     'Hola La Guada, quiero consultar disponibilidad para una reserva:',
     '',
@@ -1258,7 +1293,7 @@ document.querySelector('#booking-form').addEventListener('submit', event => {
     '',
     '¡Gracias!',
   ].join('\n');
-  
+
   window.open(`https://wa.me/5493834033990?text=${encodeURIComponent(message)}`, '_blank', 'noopener,noreferrer');
 });
 </script>
